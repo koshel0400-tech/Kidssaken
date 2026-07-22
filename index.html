@@ -673,10 +673,10 @@
 
         // Временные фазы трека (в секундах)
         const phaseTimes = {
-            1: { start: 0, end: 11 },   // Фаза 1: Далеко (0:00 - 0:11)
-            2: { start: 11, end: 22 },  // Фаза 2: Ближе на 2 клетки (0:11 - 0:22)
-            3: { start: 22, end: 32 },  // Фаза 3: Ещё ближе на 2 клетки (0:22 - 0:32)
-            4: { start: 32, end: 76 }   // Фаза 4: Вплотную (0:32 - 1:16)
+            1: { start: 0.0, end: 11.0 },   // Фаза 1: Далеко (0:00 - 0:11)
+            2: { start: 11.0, end: 22.0 },  // Фаза 2: Ближе на 2 клетки (0:11 - 0:22)
+            3: { start: 22.0, end: 32.0 },  // Фаза 3: Ещё ближе на 2 клетки (0:22 - 0:32)
+            4: { start: 32.0, end: 76.0 }   // Фаза 4: Вплотную (0:32 - 1:16)
         };
 
         let currentPhase = 0; // 0 - нет погони
@@ -747,9 +747,14 @@
                     chaseAudio.play().catch(e => console.log(e));
                 }
             } else {
-                // Зацикливание внутри текущей фазы
-                if (chaseAudio.currentTime >= phaseTimes[currentPhase].end) {
-                    chaseAudio.currentTime = phaseTimes[currentPhase].start;
+                // ПРИНУДИТЕЛЬНОЕ ЗАЦИКЛИВАНИЕ ТЕКУЩЕЙ ФАЗЫ ПО КРУГУ
+                if (isAudioUnlocked && currentPhase !== 0) {
+                    if (chaseAudio.paused) {
+                        chaseAudio.play().catch(e => console.log(e));
+                    }
+                    if (chaseAudio.currentTime >= phaseTimes[currentPhase].end - 0.1 || chaseAudio.currentTime < phaseTimes[currentPhase].start) {
+                        chaseAudio.currentTime = phaseTimes[currentPhase].start;
+                    }
                 }
             }
         }
